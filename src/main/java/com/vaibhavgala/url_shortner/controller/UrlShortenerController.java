@@ -19,7 +19,7 @@ public class UrlShortenerController {
     @PostMapping("/shorten")
     public ResponseEntity<String> shorten(@RequestParam String url) {
         String shortCode = service.shortenUrl(url);
-        String shortUrl = "https://snaplink-ov05.onrender.com/" + shortCode;
+        String shortUrl = "https://snaplink-ov05.onrender.com/api/" + shortCode;
         return ResponseEntity.ok(shortUrl);
     }
 
