@@ -18,6 +18,11 @@ public class UrlShortnerService {
     }
 
     public String shortenUrl(String originalUrl) {
+
+        Optional<UrlMapping> existingMapping = repository.findByOriginalUrl(originalUrl);
+        if (existingMapping.isPresent()) {
+            return existingMapping.get().getShortCode();
+        }
         UrlMapping mapping = new UrlMapping();
         mapping.setOriginalUrl(originalUrl);
         repository.save(mapping);
