@@ -9,7 +9,7 @@ public class UrlShortnerApplication {
 
 	public static void main(String[] args) {
 
-		Dotenv dotenv = Dotenv.load();
+
 
 		SpringApplication.run(UrlShortnerApplication.class, args);
 	}
