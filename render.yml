@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: url-shortener-app
+    env: java
+    repo: https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -Dserver.port=$PORT -jar target/*.jar
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: url-shortener-db
+          property: connectionString
+      - key: JAVA_OPTS
+        value: -Xmx512m -Xms256m
+    healthCheckPath: /
+
+databases:
+  - name: url-shortener-db
+    databaseName: url_shortener
+    user: url_shortener_user
+    plan: free
