@@ -17,11 +17,13 @@ RUN ./mvnw dependency:go-offline -B
 # Copy source code
 COPY src src
 
-# Build the application
-RUN ./mvnw package -DskipTests
 
 # Expose port
 EXPOSE 8080
 
-# Run the application
-CMD ["java", "-jar", "target/*.jar"]
+
+
+# Build the application
+RUN ./mvnw package -DskipTests && mv target/*.jar app.jar
+CMD ["java", "-jar", "app.jar"]
+
