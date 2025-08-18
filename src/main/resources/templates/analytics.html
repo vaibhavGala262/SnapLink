@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Analytics Dashboard</title>
+    <link rel="stylesheet" href="styles/analytics.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 class="title">📊 Analytics Dashboard</h1>
+        <p class="subtitle">Beautiful insights for your shortened URLs</p>
+    </div>
+    <!-- Horizontal nav menu -->
+    <nav class="nav-menu nav-horiz">
+        <a href="index.html" class="nav-link">🔗 Shorten URL</a>
+        <a href="analytics.html" class="nav-link active">📊 Analytics Dashboard</a>
+    </nav>
+    <div class="search-section">
+        <div class="search-wrapper">
+            <input
+                    type="text"
+                    id="shortCodeInput"
+                    class="search-input"
+                    placeholder="Enter short code (e.g., jxWugFH)">
+            <button id="searchBtn" class="search-btn">Get Analytics</button>
+        </div>
+    </div>
+    <div class="loading" id="loading">Loading analytics data</div>
+    <div class="error" id="error">
+        <strong>Error:</strong> <span id="errorMessage"></span>
+    </div>
+    <div class="analytics-content" id="analyticsContent">
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number" id="totalClicks">0</div>
+                <div class="stat-label">Total Clicks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="uniqueCountries">0</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="uniqueDevices">0</div>
+                <div class="stat-label">Device Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="peakHour">0</div>
+                <div class="stat-label">Peak Hour</div>
+            </div>
+        </div>
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3 class="chart-title">🌍 Geographic Distribution</h3>
+                <div class="chart-wrapper">
+                    <canvas id="countryChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">📱 Device Analytics</h3>
+                <div class="chart-wrapper">
+                    <canvas id="deviceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="secondary-charts">
+            <div class="chart-card">
+                <h3 class="chart-title">🕒 24-Hour Activity Pattern</h3>
+                <div class="chart-wrapper">
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">🔗 Traffic Sources</h3>
+                <div class="chart-wrapper">
+                    <canvas id="referrerChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="recent-clicks">
+            <h3 class="section-title">🕐 Recent Click Activity</h3>
+            <div id="recentClicksData"></div>
+        </div>
+    </div>
+</div>
+<script src="scripts/analytics.js"></script>
+</body>
+</html>

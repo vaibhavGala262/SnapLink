@@ -4,261 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: 600px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #64748b;
-            font-size: 1.1rem;
-            font-weight: 400;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .url-input {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
-            outline: none;
-        }
-
-        .url-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            background: white;
-        }
-
-        .url-input::placeholder {
-            color: #94a3b8;
-        }
-
-        .shorten-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .shorten-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-
-        .shorten-btn:active {
-            transform: translateY(0);
-        }
-
-        .shorten-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .result-section {
-            display: none;
-            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-            border-radius: 16px;
-            padding: 24px;
-            margin-top: 24px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .result-section.show {
-            display: block;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .result-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .url-display {
-            display: flex;
-            align-items: center;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-        }
-
-        .shortened-url {
-            flex: 1;
-            font-family: 'Monaco', 'Menlo', monospace;
-            color: #3730a3;
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 4px 0;
-            background: none;
-            border: none;
-            outline: none;
-        }
-
-        .copy-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-left: 12px;
-        }
-
-        .copy-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .copy-btn.copied {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            color: #64748b;
-            margin-top: 16px;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #e2e8f0;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
-            color: #dc2626;
-            padding: 16px;
-            border-radius: 12px;
-            margin-top: 16px;
-            border: 1px solid #fca5a5;
-            display: none;
-        }
-
-        .error.show {
-            display: block;
-            animation: slideIn 0.3s ease;
-        }
-
-        @media (max-width: 640px) {
-            .container {
-                padding: 24px;
-            }
-
-            .title {
-                font-size: 2rem;
-            }
-
-            .url-display {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .copy-btn {
-                width: 100%;
-                margin-left: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1 class="title">✂️ URL Shortener</h1>
         <p class="subtitle">Transform your long URLs into short, shareable links</p>
+    </div>
+
+    <div class="nav-menu">
+        <a href="#" class="nav-link active">🔗 Shorten URL</a>
+        <a href="analytics.html" class="nav-link">📊 Analytics Dashboard</a>
     </div>
 
     <form id="shortenForm">
@@ -272,6 +29,25 @@
                         required
                 >
             </div>
+
+            <!-- Custom Alias Toggle -->
+            <div class="custom-alias-section">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="customAliasToggle" class="custom-checkbox">
+                    <label for="customAliasToggle" class="checkbox-label">Custom Alias</label>
+                </div>
+                <div class="alias-input-wrapper" id="aliasInputWrapper" style="display: none;">
+                    <input
+                            type="text"
+                            id="aliasInput"
+                            class="alias-input"
+                            placeholder="Enter custom alias (optional)..."
+                            pattern="[a-zA-Z0-9-_]+"
+                            title="Only letters, numbers, hyphens, and underscores allowed"
+                    >
+                </div>
+            </div>
+
             <button type="submit" id="shortenBtn" class="shorten-btn">
                 Shorten URL
             </button>
@@ -293,112 +69,39 @@
             <button id="copyBtn" class="copy-btn">Copy</button>
         </div>
     </div>
+
+    <div class="analytics-section" id="analyticsSection">
+        <button id="viewAnalyticsBtn" class="analytics-btn">
+            📊 View Full Analytics Dashboard
+        </button>
+
+        <div class="quick-analytics" id="quickAnalytics">
+            <div class="analytics-header">
+                <h4 class="analytics-title">Quick Stats</h4>
+                <button id="refreshStats" class="full-analytics-link">🔄 Refresh</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div id="quickClicks" class="stat-number">0</div>
+                    <div class="stat-label">Clicks</div>
+                </div>
+                <div class="stat-item">
+                    <div id="quickCountries" class="stat-number">0</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-item">
+                    <div id="quickDevices" class="stat-number">0</div>
+                    <div class="stat-label">Devices</div>
+                </div>
+                <div class="stat-item">
+                    <div id="quickReferrers" class="stat-number">0</div>
+                    <div class="stat-label">Sources</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script>
-    const form = document.getElementById('shortenForm');
-    const urlInput = document.getElementById('urlInput');
-    const shortenBtn = document.getElementById('shortenBtn');
-    const loading = document.getElementById('loading');
-    const resultSection = document.getElementById('resultSection');
-    const shortenedUrl = document.getElementById('shortenedUrl');
-    const copyBtn = document.getElementById('copyBtn');
-    const error = document.getElementById('error');
-    const errorMessage = document.getElementById('errorMessage');
-
-    // Hide error and result sections initially
-    function hideMessages() {
-        error.classList.remove('show');
-        resultSection.classList.remove('show');
-    }
-
-    // Show error message
-    function showError(message) {
-        errorMessage.textContent = message;
-        error.classList.add('show');
-    }
-
-    // Show loading state
-    function showLoading(show) {
-        loading.classList.toggle('show', show);
-        shortenBtn.disabled = show;
-        shortenBtn.textContent = show ? 'Shortening...' : 'Shorten URL';
-    }
-
-    // Form submission
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideMessages();
-
-        const url = urlInput.value.trim();
-        if (!url) {
-            showError('Please enter a valid URL');
-            return;
-        }
-
-        showLoading(true);
-
-        try {
-            const formData = new FormData();
-            formData.append('url', url);
-
-            const response = await fetch('/api/shorten', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const shortUrl = await response.text();
-
-            shortenedUrl.value = shortUrl;
-            resultSection.classList.add('show');
-
-            // Reset copy button
-            copyBtn.textContent = 'Copy';
-            copyBtn.classList.remove('copied');
-
-        } catch (err) {
-            console.error('Error:', err);
-            showError('Failed to shorten URL. Please try again.');
-        } finally {
-            showLoading(false);
-        }
-    });
-
-    // Copy functionality
-    copyBtn.addEventListener('click', async () => {
-        try {
-            await navigator.clipboard.writeText(shortenedUrl.value);
-            copyBtn.textContent = 'Copied!';
-            copyBtn.classList.add('copied');
-
-            setTimeout(() => {
-                copyBtn.textContent = 'Copy';
-                copyBtn.classList.remove('copied');
-            }, 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-
-            // Fallback for older browsers
-            shortenedUrl.select();
-            shortenedUrl.setSelectionRange(0, 99999);
-            document.execCommand('copy');
-
-            copyBtn.textContent = 'Copied!';
-            copyBtn.classList.add('copied');
-
-            setTimeout(() => {
-                copyBtn.textContent = 'Copy';
-                copyBtn.classList.remove('copied');
-            }, 2000);
-        }
-    });
-
-    // Clear messages when user starts typing
-    urlInput.addEventListener('input', hideMessages);
-</script>
+<script src="scripts/main.js"></script>
 </body>
 </html>
