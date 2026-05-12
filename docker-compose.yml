@@ -11,6 +11,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_TIMEOUT: 2000ms
+      REDIS_HEALTH_ENABLED: "false"
       KAFKA_BOOTSTRAP_SERVERS: snaplink-kafka:9092
     depends_on:
       - postgres
