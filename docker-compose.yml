@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: snaplink-app
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/snaplink
+      DATABASE_USERNAME: snaplink
+      DATABASE_PASSWORD: snaplink
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_TIMEOUT: 2000ms
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+
+  postgres:
+    image: postgres:16
+    container_name: snaplink-postgres
+    environment:
+      POSTGRES_DB: snaplink
+      POSTGRES_USER: snaplink
+      POSTGRES_PASSWORD: snaplink
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: snaplink-redis
+    ports:
+      - "6379:6379"
+
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: snaplink-zookeeper
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: snaplink-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9092:9092"
+
+volumes:
+  postgres_data:
