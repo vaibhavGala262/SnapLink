@@ -14,8 +14,7 @@ public class GeoIPConfig {
     @ConditionalOnProperty(name = "geoip.enabled", havingValue = "true")
     public DatabaseReader databaseReader() throws Exception {
         File database = new File(System.getenv().getOrDefault(
-                "GEOIP_DB_PATH", "src/main/resources/GeoLite2-City.mmdb"
-        ));
+                "GEOIP_DB_PATH", "src/main/resources/GeoLite2-City.mmdb"));
         return new DatabaseReader.Builder(database).build();
     }
 }

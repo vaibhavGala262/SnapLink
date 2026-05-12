@@ -38,9 +38,15 @@ public class UrlShortenerController {
     public ResponseEntity<String> shorten(
             @RequestParam String url,
             @RequestParam(required = false) String alias,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime expiresAt) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime expiresAt,
+            HttpServletRequest request) {
 
         String prefix = env.getProperty("PREFIX_WEBSITE_DOMAIN");
+        if (prefix == null || prefix.isBlank()) {
+            String scheme = request.getScheme();
+            String host = request.getHeader("Host");
+            prefix = scheme + "://" + host + "/";
+        }
         String shortCode = service.shortenUrl(url,alias, expiresAt);  // Pass expiry (can be null)
         String shortUrl = prefix + shortCode;
         return ResponseEntity.ok(shortUrl);

@@ -1,4 +1,5 @@
 package com.vaibhavgala.url_shortner;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 import org.springframework.boot.SpringApplication;
@@ -15,7 +16,6 @@ public class UrlShortnerApplication {
 		dotenv.entries().forEach(entry -> {
 			System.setProperty(entry.getKey(), entry.getValue());
 		});
-
 
 		SpringApplication.run(UrlShortnerApplication.class, args);
 	}
