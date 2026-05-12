@@ -15,10 +15,12 @@ import java.time.LocalDateTime;
 public class UrlClickAnalytics {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "url_click_analytics_seq")
+    @SequenceGenerator(name = "url_click_analytics_seq", sequenceName = "url_click_analytics_seq", allocationSize = 50) // Match your batch size
     private Long id;
 
-    @Column(unique =true , name = "short_code", nullable = false)
+
+    @Column( name = "short_code", nullable = false)
     private String shortCode;
 
     @Column(name = "timestamp")

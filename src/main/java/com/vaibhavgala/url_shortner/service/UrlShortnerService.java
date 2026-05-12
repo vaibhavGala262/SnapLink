@@ -6,6 +6,7 @@ import com.vaibhavgala.url_shortner.repo.UrlMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -96,6 +97,8 @@ public class UrlShortnerService {
     /**
      * Creates new mapping and saves to DB and cache
      */
+
+    @Transactional
     private String createNewMapping(String originalUrl, String shortCode, LocalDateTime expiresAt) {
         UrlMapping mapping = new UrlMapping();
         mapping.setOriginalUrl(originalUrl);

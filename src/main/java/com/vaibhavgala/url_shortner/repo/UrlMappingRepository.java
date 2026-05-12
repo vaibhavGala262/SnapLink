@@ -17,10 +17,11 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
     boolean existsByShortCode(String shortCode);
 
     Optional<UrlMapping> findByOriginalUrl(String originalUrl);
+
     @Modifying
     @Transactional
-    @Query("UPDATE UrlMapping u SET u.clickCount = u.clickCount + 1 WHERE u.shortCode = ?1")
-    void incrementClickCount(String shortCode);
+    @Query("UPDATE UrlMapping u SET u.clickCount = u.clickCount + :count WHERE u.shortCode = :shortCode")
+    void incrementClickCountBy(String shortCode, int count);
 
 
     long countByCustom(boolean isCustom);
