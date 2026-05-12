@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
 public class UrlShortenerController {
 
     private final UrlShortnerService service;
@@ -34,7 +33,7 @@ public class UrlShortenerController {
     }
 
     //  SINGLE /shorten endpoint with OPTIONAL expiry
-    @PostMapping("/shorten")
+    @PostMapping("/api/shorten")
     public ResponseEntity<String> shorten(
             @RequestParam String url,
             @RequestParam(required = false) String alias,
