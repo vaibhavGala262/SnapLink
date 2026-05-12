@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   app:
     build: .
@@ -46,7 +44,7 @@ services:
       - "2181:2181"
 
   kafka:
-    image: bitnami/kafka:3.7
+    image: bitnami/kafka:3.7.1
     container_name: snaplink-kafka
     depends_on:
       - zookeeper
