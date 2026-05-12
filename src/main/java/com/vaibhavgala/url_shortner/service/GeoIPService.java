@@ -3,6 +3,7 @@ package com.vaibhavgala.url_shortner.service;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,14 +14,30 @@ public class GeoIPService {
     private final DatabaseReader geoReader;
 
     public GeoIPService() throws IOException {
-        File database = new File("src/main/resources/GeoLite2-City.mmdb");
-        if (!database.exists()) {
-            System.err.println("❌ GeoLite2-City.mmdb NOT FOUND at: " + database.getAbsolutePath());
-            this.geoReader = null;
-        } else {
-            System.out.println("✅ GeoLite2-City.mmdb loaded successfully");
-            this.geoReader = new DatabaseReader.Builder(database).build();
+        DatabaseReader reader = null;
+        String envPath = System.getenv("GEOIP_DB_PATH");
+
+        if (envPath != null && !envPath.isBlank()) {
+            File database = new File(envPath);
+            if (database.exists()) {
+                System.out.println("✅ GeoLite2-City.mmdb loaded from GEOIP_DB_PATH");
+                reader = new DatabaseReader.Builder(database).build();
+            }
         }
+
+        if (reader == null) {
+            ClassPathResource resource = new ClassPathResource("GeoLite2-City.mmdb");
+            if (resource.exists()) {
+                System.out.println("✅ GeoLite2-City.mmdb loaded from classpath");
+                reader = new DatabaseReader.Builder(resource.getInputStream()).build();
+            }
+        }
+
+        if (reader == null) {
+            System.err.println("❌ GeoLite2-City.mmdb NOT FOUND (set GEOIP_DB_PATH or include resource)");
+        }
+
+        this.geoReader = reader;
     }
 
     public String getCountry(String ip) {
