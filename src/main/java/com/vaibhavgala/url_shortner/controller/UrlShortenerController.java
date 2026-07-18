@@ -32,7 +32,7 @@ public class UrlShortenerController {
         this.service = service;
     }
 
-    //  SINGLE /shorten endpoint with OPTIONAL expiry
+    // SINGLE /shorten endpoint with OPTIONAL expiry
     @PostMapping("/api/shorten")
     public ResponseEntity<String> shorten(
             @RequestParam String url,
@@ -46,7 +46,7 @@ public class UrlShortenerController {
             String host = request.getHeader("Host");
             prefix = scheme + "://" + host + "/";
         }
-        String shortCode = service.shortenUrl(url,alias, expiresAt);  // Pass expiry (can be null)
+        String shortCode = service.shortenUrl(url, alias, expiresAt); // Pass expiry (can be null)
         String shortUrl = prefix + shortCode;
         return ResponseEntity.ok(shortUrl);
     }
@@ -54,7 +54,7 @@ public class UrlShortenerController {
     @GetMapping("/{shortCode}")
     public ResponseEntity<Object> redirect(@PathVariable String shortCode, HttpServletRequest request) {
         Optional<String> originalUrl = service.getOriginalUrl(shortCode);
-//        String IP_ADDRESS = clientIPService.getClientIP(request);
+        // String IP_ADDRESS = clientIPService.getClientIP(request);
 
         if (originalUrl.isPresent()) {
             // KAFKA: Send click event (non-blocking, 1-2ms)
@@ -62,8 +62,7 @@ public class UrlShortenerController {
                     shortCode,
                     request.getRemoteAddr(),
                     request.getHeader("User-Agent"),
-                    request.getHeader("Referer")
-            );
+                    request.getHeader("Referer"));
 
             return ResponseEntity.status(302).location(URI.create(originalUrl.get())).build();
         }
