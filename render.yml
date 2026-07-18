@@ -5,10 +5,18 @@ services:
     repo: https://github.com/vaibhavgala262/Snaplink.git
     plan: free
     envVars:
-      - key: DATABASE_URL
+      - key: DB_HOST
         fromDatabase:
           name: url-shortener-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: url-shortener-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: url-shortener-db
+          property: database
       - key: DATABASE_USERNAME
         fromDatabase:
           name: url-shortener-db
