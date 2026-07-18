@@ -3,88 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Analytics Dashboard</title>
+    <title>Snaplink | Analytics — Command Center</title>
+    <meta name="description" content="Deep analytics insights for your Snaplink shortened URLs.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/analytics.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1 class="title">📊 Analytics Dashboard</h1>
-        <p class="subtitle">Beautiful insights for your shortened URLs</p>
-    </div>
-    <!-- Horizontal nav menu -->
-    <nav class="nav-menu nav-horiz">
-        <a href="index.html" class="nav-link">🔗 Shorten URL</a>
-        <a href="analytics.html" class="nav-link active">📊 Analytics Dashboard</a>
+<body class="analytics-page">
+
+    <!-- ===================== TOP NAV ===================== -->
+    <nav class="top-nav" id="topNav">
+        <div class="nav-left">
+            <div class="brand-logo">SNAPLINK</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" id="nav-shorten">Shortener Hub</a>
+                <a href="analytics.html" class="nav-link active" id="nav-analytics">Analytics</a>
+            </div>
+        </div>
     </nav>
-    <div class="search-section">
-        <div class="search-wrapper">
-            <input
-                    type="text"
-                    id="shortCodeInput"
-                    class="search-input"
-                    placeholder="Enter short code (e.g., jxWugFH)">
-            <button id="searchBtn" class="search-btn">Get Analytics</button>
-        </div>
-    </div>
-    <div class="loading" id="loading">Loading analytics data</div>
-    <div class="error" id="error">
-        <strong>Error:</strong> <span id="errorMessage"></span>
-    </div>
-    <div class="analytics-content" id="analyticsContent">
-        <div class="stats-overview">
-            <div class="stat-card">
-                <div class="stat-number" id="totalClicks">0</div>
-                <div class="stat-label">Total Clicks</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="uniqueCountries">0</div>
-                <div class="stat-label">Countries</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="uniqueDevices">0</div>
-                <div class="stat-label">Device Types</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="peakHour">0</div>
-                <div class="stat-label">Peak Hour</div>
-            </div>
-        </div>
-        <div class="charts-container">
-            <div class="chart-card">
-                <h3 class="chart-title">🌍 Geographic Distribution</h3>
-                <div class="chart-wrapper">
-                    <canvas id="countryChart"></canvas>
+
+    <main class="analytics-main">
+
+        <!-- ===================== COMMAND CENTER HEADER ===================== -->
+        <div class="cc-header">
+            <div class="cc-header-left">
+                <div class="cc-label">COMMAND CENTER</div>
+                <div class="cc-url-row">
+                    <h1 class="cc-url" id="ccUrl">snaplink.io/your-link</h1>
+                    <button class="cc-switch-btn" onclick="document.getElementById('searchModal').style.display='flex'">Switch Link ▾</button>
                 </div>
+                <div class="cc-meta" id="ccMeta">Enter a short code to load analytics data</div>
             </div>
-            <div class="chart-card">
-                <h3 class="chart-title">📱 Device Analytics</h3>
-                <div class="chart-wrapper">
-                    <canvas id="deviceChart"></canvas>
+            <div class="cc-header-right">
+                <!-- Removed Reset Stats button -->
+            </div>
+        </div>
+
+        <!-- ===================== SEARCH MODAL ===================== -->
+        <div class="search-modal-overlay" id="searchModal" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+            <div class="search-modal-card">
+                <div class="search-modal-title">Load Analytics</div>
+                <div class="search-modal-row">
+                    <input type="text" id="shortCodeInput" class="search-modal-input" placeholder="Enter short code (e.g. jxWugFH)">
+                    <button id="searchBtn" class="search-modal-btn">Analyze</button>
+                </div>
+                <div id="loadingState" class="modal-loading" style="display:none;">
+                    <div class="loading-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div id="errorState" class="modal-error" style="display:none;">
+                    <span id="errorMessage"></span>
                 </div>
             </div>
         </div>
-        <div class="secondary-charts">
-            <div class="chart-card">
-                <h3 class="chart-title">🕒 24-Hour Activity Pattern</h3>
-                <div class="chart-wrapper">
+
+        <!-- ===================== EMPTY STATE ===================== -->
+        <div id="emptyState" class="empty-dashboard-state">
+            <div class="empty-state-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
+            <h2 class="empty-state-title">No Link Selected</h2>
+            <p class="empty-state-desc">Enter a short code to unveil deep analytics, live traffic streams, and geographic intelligence for your link.</p>
+            <button class="empty-state-btn" onclick="document.getElementById('searchModal').style.display='flex'">Load Analytics Data</button>
+        </div>
+
+        <!-- ===================== DASHBOARD CONTENT ===================== -->
+        <div id="dashboardContent" style="display:none;">
+            <!-- KPI CARDS -->
+            <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-top-row">
+                    <span class="kpi-label">TOTAL CLICKS</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                </div>
+                <div class="kpi-value" id="totalClicks">—</div>
+                <div class="kpi-delta positive" id="clicksDelta">—</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-top-row">
+                    <span class="kpi-label">REACH</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
+                <div class="kpi-value" id="uniqueCountries">—</div>
+                <div class="kpi-sublabel">Global distributions</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-top-row">
+                    <span class="kpi-label">MAIN DEVICE</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
+                </div>
+                <div class="kpi-value kpi-device-value" id="uniqueDevices">—</div>
+                <div class="kpi-sublabel" id="deviceSublabel">—</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-top-row">
+                    <span class="kpi-label">PEAK ACTIVITY</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div class="kpi-value kpi-time" id="peakHour">—</div>
+                <div class="kpi-sublabel">GMT Standard Time</div>
+            </div>
+        </div>
+
+        <!-- ===================== CHARTS ROW 1 ===================== -->
+        <div class="charts-row">
+            <!-- 24hr activity stream -->
+            <div class="chart-panel wide-panel">
+                <div class="panel-header">
+                    <span class="panel-title">24-Hour Activity Stream</span>
+                    <div class="panel-legend">
+                        <span class="legend-dot active-dot"></span><span class="legend-text">Active</span>
+                        <span class="legend-dot pred-dot"></span><span class="legend-text">Predictive</span>
+                    </div>
+                </div>
+                <div class="chart-container hourly-container">
                     <canvas id="hourlyChart"></canvas>
                 </div>
             </div>
-            <div class="chart-card">
-                <h3 class="chart-title">🔗 Traffic Sources</h3>
-                <div class="chart-wrapper">
-                    <canvas id="referrerChart"></canvas>
+
+            <!-- Device ecosystem -->
+            <div class="chart-panel narrow-panel device-panel">
+                <div class="panel-header">
+                    <span class="panel-title">Device Ecosystem</span>
+                </div>
+                <div class="device-donut-wrapper">
+                    <canvas id="deviceChart"></canvas>
+                    <div class="device-donut-center" id="deviceDonutCenter">
+                        <span class="device-pct" id="topDevicePct">—</span>
+                        <span class="device-name" id="topDeviceName">MOBILE</span>
+                    </div>
+                </div>
+                <div class="device-breakdown" id="deviceBreakdown">
+                    <!-- populated by JS -->
                 </div>
             </div>
         </div>
-        <div class="recent-clicks">
-            <h3 class="section-title">🕐 Recent Click Activity</h3>
-            <div id="recentClicksData"></div>
+
+        <div class="geo-section">
+            <div class="panel-header">
+                <span class="panel-title">Geographic Influence</span>
+                <span class="panel-subtitle" id="geoSubtitle">Click counts by country</span>
+            </div>
+            <div class="geo-country-list" id="geoCountryList">
+                <!-- populated by JS -->
+            </div>
+            <button class="load-more-btn" id="geoLoadMoreBtn" style="display:none; margin-top: 15px;">Load 5 More ▾</button>
         </div>
-    </div>
-</div>
-<script src="scripts/analytics.js"></script>
+
+        <!-- ===================== TRAFFIC ACQUISITION ===================== -->
+        <div class="acquisition-section">
+            <div class="panel-header">
+                <span class="panel-title">Traffic Acquisition</span>
+            </div>
+            <div class="acquisition-bars" id="acquisitionBars">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- ===================== LIVE TRAFFIC STREAM ===================== -->
+        <div class="live-traffic-section">
+            <div class="live-traffic-header">
+                <span class="panel-title">Live Traffic Stream</span>
+                <div class="lts-controls">
+                    <div class="lts-search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="ltsFilterInput" placeholder="Filter by referrer, location, browser..." class="lts-search-input">
+                    </div>
+                    <div class="lts-filter-tags" id="ltsFilterTags"></div>
+                </div>
+            </div>
+            <div class="traffic-table-wrapper">
+                <table class="traffic-table">
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>IDENTITY &amp; BROWSER</th>
+                            <th>OS / DEVICE</th>
+                            <th>LOCATION</th>
+                            <th>REFERRER</th>
+                            <th>DETAILS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentClicksData">
+                        <tr class="no-data-row">
+                            <td colspan="6">Load a short code to view live traffic</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="load-more-btn" id="loadMoreBtn" style="display:none;">Load More Activity ▾</button>
+        </div>
+        </div> <!-- End dashboardContent -->
+
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="site-footer">
+        <div class="footer-left">
+            <div class="footer-brand">SNAPLINK PRECISION</div>
+            <div class="footer-copy">© 2024 Snaplink Precision Systems. All rights reserved.</div>
+        </div>
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Security</a>
+            <a href="#">Status</a>
+        </div>
+    </footer>
+
+    <script src="scripts/analytics.js"></script>
 </body>
 </html>

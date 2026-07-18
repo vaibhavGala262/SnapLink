@@ -3,105 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener</title>
+    <title>Snaplink | Shortener Hub</title>
+    <meta name="description" content="Precision URL shortening with enterprise-grade analytics.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1 class="title">✂️ URL Shortener</h1>
-        <p class="subtitle">Transform your long URLs into short, shareable links</p>
-    </div>
 
-    <div class="nav-menu">
-        <a href="#" class="nav-link active">🔗 Shorten URL</a>
-        <a href="analytics.html" class="nav-link">📊 Analytics Dashboard</a>
-    </div>
-
-    <form id="shortenForm">
-        <div class="form-group">
-            <div class="input-wrapper">
-                <input
-                        type="url"
-                        id="urlInput"
-                        class="url-input"
-                        placeholder="Enter your long URL here..."
-                        required
-                >
-            </div>
-
-            <!-- Custom Alias Toggle -->
-            <div class="custom-alias-section">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="customAliasToggle" class="custom-checkbox">
-                    <label for="customAliasToggle" class="checkbox-label">Custom Alias</label>
-                </div>
-                <div class="alias-input-wrapper" id="aliasInputWrapper" style="display: none;">
-                    <input
-                            type="text"
-                            id="aliasInput"
-                            class="alias-input"
-                            placeholder="Enter custom alias (optional)..."
-                            pattern="[a-zA-Z0-9-_]+"
-                            title="Only letters, numbers, hyphens, and underscores allowed"
-                    >
-                </div>
-            </div>
-
-            <button type="submit" id="shortenBtn" class="shorten-btn">
-                Shorten URL
-            </button>
-        </div>
-    </form>
-
-    <div class="loading" id="loading">
-        Generating your short URL
-    </div>
-
-    <div class="error" id="error">
-        <strong>Error:</strong> <span id="errorMessage"></span>
-    </div>
-
-    <div class="result-section" id="resultSection">
-        <h3 class="result-title">🎉 Your shortened URL is ready!</h3>
-        <div class="url-display">
-            <input type="text" id="shortenedUrl" class="shortened-url" readonly>
-            <button id="copyBtn" class="copy-btn">Copy</button>
-        </div>
-    </div>
-
-    <div class="analytics-section" id="analyticsSection">
-        <button id="viewAnalyticsBtn" class="analytics-btn">
-            📊 View Full Analytics Dashboard
-        </button>
-
-        <div class="quick-analytics" id="quickAnalytics">
-            <div class="analytics-header">
-                <h4 class="analytics-title">Quick Stats</h4>
-                <button id="refreshStats" class="full-analytics-link">🔄 Refresh</button>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div id="quickClicks" class="stat-number">0</div>
-                    <div class="stat-label">Clicks</div>
-                </div>
-                <div class="stat-item">
-                    <div id="quickCountries" class="stat-number">0</div>
-                    <div class="stat-label">Countries</div>
-                </div>
-                <div class="stat-item">
-                    <div id="quickDevices" class="stat-number">0</div>
-                    <div class="stat-label">Devices</div>
-                </div>
-                <div class="stat-item">
-                    <div id="quickReferrers" class="stat-number">0</div>
-                    <div class="stat-label">Sources</div>
-                </div>
+    <!-- ===================== TOP NAV ===================== -->
+    <nav class="top-nav" id="topNav">
+        <div class="nav-left">
+            <div class="brand-logo">SNAPLINK</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active" id="nav-shorten">Shortener Hub</a>
+                <a href="analytics.html" class="nav-link" id="nav-analytics">Analytics</a>
             </div>
         </div>
-    </div>
-</div>
+    </nav>
 
-<script src="scripts/main.js"></script>
+    <!-- ===================== HERO ===================== -->
+    <main class="main-content">
+        <section class="hero-section">
+            <h1 class="hero-heading">Precision in Every Link</h1>
+            <p class="hero-subtext">Elevate your digital presence with short URLs that command attention. High-precision analytics meeting ethereal engineering.</p>
+        </section>
+
+        <!-- ===================== URL SHORTENER FORM ===================== -->
+        <section class="form-section">
+            <div class="form-card" id="formCard">
+                <form id="shortenForm">
+                    <div class="url-field-row">
+                        <div class="url-field-wrapper">
+                            <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            <input type="url" id="urlInput" class="url-input" placeholder="Paste your long destination URL..." required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="form-bottom-row">
+                        <div class="alias-toggle-group">
+                            <label class="checkbox-label" for="customAliasToggle">
+                                <input type="checkbox" id="customAliasToggle" class="native-checkbox">
+                                <span class="custom-checkbox-box"></span>
+                                <span class="checkbox-text">Custom Alias</span>
+                            </label>
+                            <div class="alias-field" id="aliasInputWrapper" style="display:none;">
+                                <input type="text" id="aliasInput" class="alias-input" placeholder="my-brand-link" pattern="[a-zA-Z0-9-_]+" title="Letters, numbers, hyphens and underscores only">
+                            </div>
+                        </div>
+                        <button type="submit" id="shortenBtn" class="shorten-cta-btn">
+                            <span id="btnText">SHORTEN URL</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- States -->
+                <div id="loadingState" class="form-state loading-state" style="display:none;">
+                    <div class="loading-dots"><span></span><span></span><span></span></div>
+                    <span>Forging your link...</span>
+                </div>
+
+                <div id="errorState" class="form-state error-state" style="display:none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span id="errorMessage"></span>
+                </div>
+
+                <div id="resultSection" class="result-section" style="display:none;">
+                    <div class="result-label">Your shortened URL is ready</div>
+                    <div class="result-row">
+                        <input type="text" id="shortenedUrl" class="result-url-input" readonly>
+                        <button id="copyBtn" class="copy-action-btn">Copy</button>
+                    </div>
+                    <a href="analytics.html" class="result-analytics-link" id="analyticsLink">View Analytics →</a>
+                </div>
+            </div>
+        </section>
+
+
+
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="site-footer">
+        <div class="footer-left">
+            <div class="footer-brand">SNAPLINK PRECISION</div>
+            <div class="footer-copy">© 2024 Snaplink Precision Systems. All rights reserved.</div>
+        </div>
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Security</a>
+            <a href="#">Status</a>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
 </body>
 </html>

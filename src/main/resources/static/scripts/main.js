@@ -1,274 +1,145 @@
+/* ============================================================
+   MAIN.JS — Shortener Hub Logic
+   ============================================================ */
 class URLShortener {
     constructor() {
-        this.form = document.getElementById('shortenForm');
-        this.urlInput = document.getElementById('urlInput');
-        this.aliasInput = document.getElementById('aliasInput');
-        this.customAliasToggle = document.getElementById('customAliasToggle');
-        this.aliasInputWrapper = document.getElementById('aliasInputWrapper');
-        this.shortenBtn = document.getElementById('shortenBtn');
-        this.loading = document.getElementById('loading');
+        this.form        = document.getElementById('shortenForm');
+        this.urlInput    = document.getElementById('urlInput');
+        this.aliasToggle = document.getElementById('customAliasToggle');
+        this.aliasWrapper= document.getElementById('aliasInputWrapper');
+        this.aliasInput  = document.getElementById('aliasInput');
+        this.shortenBtn  = document.getElementById('shortenBtn');
+        this.btnText     = document.getElementById('btnText');
+
+        this.loadingState  = document.getElementById('loadingState');
+        this.errorState    = document.getElementById('errorState');
+        this.errorMessage  = document.getElementById('errorMessage');
         this.resultSection = document.getElementById('resultSection');
-        this.shortenedUrl = document.getElementById('shortenedUrl');
-        this.copyBtn = document.getElementById('copyBtn');
-        this.error = document.getElementById('error');
-        this.errorMessage = document.getElementById('errorMessage');
-        this.analyticsSection = document.getElementById('analyticsSection');
-        this.viewAnalyticsBtn = document.getElementById('viewAnalyticsBtn');
-        this.quickAnalytics = document.getElementById('quickAnalytics');
-        this.refreshStats = document.getElementById('refreshStats');
+        this.shortenedUrl  = document.getElementById('shortenedUrl');
+        this.copyBtn       = document.getElementById('copyBtn');
+        this.analyticsLink = document.getElementById('analyticsLink');
+
+        // Quick stats
+        this.viewAnalyticsBtn  = document.getElementById('viewAnalyticsBtn');
 
         this.currentShortCode = '';
         this.init();
     }
 
     init() {
-        this.bindEvents();
-        this.hideMessages();
-    }
-
-    bindEvents() {
-        // Form submission
-        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-
-        // Copy functionality
+        this.form.addEventListener('submit', e => this.handleSubmit(e));
         this.copyBtn.addEventListener('click', () => this.handleCopy());
-
-        // Custom alias toggle
-        this.customAliasToggle.addEventListener('change', () => this.toggleCustomAlias());
-
-        // Analytics buttons
-        this.viewAnalyticsBtn.addEventListener('click', () => this.openAnalytics());
-        this.refreshStats.addEventListener('click', () => this.refreshAnalytics());
-
-        // Clear messages when user starts typing
-        this.urlInput.addEventListener('input', () => this.hideMessages());
-        this.aliasInput.addEventListener('input', () => this.hideMessages());
-
-        // Validate alias input
-        this.aliasInput.addEventListener('input', (e) => this.validateAlias(e));
+        this.aliasToggle.addEventListener('change', () => this.toggleAlias());
+        this.urlInput.addEventListener('input', () => this.resetStates());
     }
 
-    toggleCustomAlias() {
-        if (this.customAliasToggle.checked) {
-            this.aliasInputWrapper.style.display = 'block';
-            setTimeout(() => {
-                this.aliasInputWrapper.classList.add('show');
-                this.aliasInput.focus();
-            }, 10);
+    toggleAlias() {
+        if (this.aliasToggle.checked) {
+            this.aliasWrapper.style.display = 'flex';
+            this.aliasInput.focus();
         } else {
-            this.aliasInputWrapper.classList.remove('show');
-            setTimeout(() => {
-                this.aliasInputWrapper.style.display = 'none';
-                this.aliasInput.value = '';
-            }, 300);
+            this.aliasWrapper.style.display = 'none';
+            this.aliasInput.value = '';
         }
     }
 
-    validateAlias(e) {
-        const value = e.target.value;
-        const regex = /^[a-zA-Z0-9-_]*$/;
-
-        if (value && !regex.test(value)) {
-            e.target.setCustomValidity('Only letters, numbers, hyphens, and underscores are allowed');
-            this.showError('Custom alias can only contain letters, numbers, hyphens, and underscores');
-        } else if (value && value.length < 3) {
-            e.target.setCustomValidity('Custom alias must be at least 3 characters long');
-            this.showError('Custom alias must be at least 3 characters long');
-        } else if (value && value.length > 20) {
-            e.target.setCustomValidity('Custom alias must be less than 20 characters');
-            this.showError('Custom alias must be less than 20 characters');
-        } else {
-            e.target.setCustomValidity('');
-            this.hideMessages();
-        }
+    resetStates() {
+        this.loadingState.style.display  = 'none';
+        this.errorState.style.display    = 'none';
+        this.resultSection.style.display = 'none';
     }
 
-    hideMessages() {
-        this.error.classList.remove('show');
-        this.resultSection.classList.remove('show');
-        this.analyticsSection.classList.remove('show');
+    setLoading(on) {
+        this.loadingState.style.display = on ? 'flex' : 'none';
+        this.shortenBtn.disabled = on;
+        if (this.btnText) this.btnText.textContent = on ? 'FORGING...' : 'SHORTEN URL';
     }
 
-    showError(message) {
-        this.errorMessage.textContent = message;
-        this.error.classList.add('show');
-        console.error('URL Shortener Error:', message);
-    }
-
-    showLoading(show) {
-        this.loading.classList.toggle('show', show);
-        this.shortenBtn.disabled = show;
-        this.shortenBtn.textContent = show ? 'Shortening...' : 'Shorten URL';
-    }
-
-    async loadQuickAnalytics(shortCode) {
-        try {
-            console.log('Loading analytics for:', shortCode);
-            const response = await fetch(`/api/analytics/${shortCode}`);
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Analytics data received:', data);
-
-                document.getElementById('quickClicks').textContent = data.totalClicks || 0;
-                document.getElementById('quickCountries').textContent = data.clicksByCountry?.length || 0;
-                document.getElementById('quickDevices').textContent = data.clicksByDevice?.length || 0;
-                document.getElementById('quickReferrers').textContent = data.topReferrers?.length || 0;
-
-                this.quickAnalytics.style.display = 'block';
-            } else {
-                console.warn('Analytics not available:', response.status);
-                this.quickAnalytics.style.display = 'none';
-            }
-        } catch (err) {
-            console.warn('Analytics error:', err.message);
-            this.quickAnalytics.style.display = 'none';
-        }
+    showError(msg) {
+        this.errorMessage.textContent = msg;
+        this.errorState.style.display = 'flex';
     }
 
     async handleSubmit(e) {
         e.preventDefault();
-        this.hideMessages();
+        this.resetStates();
 
         const url = this.urlInput.value.trim();
-        const customAlias = this.customAliasToggle.checked ? this.aliasInput.value.trim() : '';
+        if (!url) return this.showError('Please enter a URL.');
+        if (!this.isValidUrl(url)) return this.showError('Please include http:// or https:// in the URL.');
 
-        // Validate inputs
-        if (!url) {
-            this.showError('Please enter a valid URL');
-            return;
+        const alias = this.aliasToggle.checked ? this.aliasInput.value.trim() : '';
+        if (alias && !this.isValidAlias(alias)) {
+            return this.showError('Alias must be 3–20 alphanumeric chars, hyphens, or underscores.');
         }
 
-        if (!this.isValidUrl(url)) {
-            this.showError('Please enter a valid URL with http:// or https://');
-            return;
-        }
-
-        if (customAlias && !this.isValidAlias(customAlias)) {
-            this.showError('Custom alias must be 3-20 characters long and contain only letters, numbers, hyphens, and underscores');
-            return;
-        }
-
-        this.showLoading(true);
+        this.setLoading(true);
 
         try {
-            const formData = new FormData();
-            formData.append('url', url);
-            if (customAlias) {
-                formData.append('alias', customAlias);
+            const fd = new FormData();
+            fd.append('url', url);
+            if (alias) fd.append('alias', alias);
+
+            const res = await fetch('/api/shorten', { method: 'POST', body: fd });
+            if (!res.ok) {
+                let txt = await res.text();
+                try {
+                    const json = JSON.parse(txt);
+                    if (json.message) txt = json.message;
+                    else if (json.error) txt = json.error;
+                } catch (e) {
+                    // response is not JSON, keep txt
+                }
+                if (res.status === 409) throw new Error('Alias already taken. Try another.');
+                throw new Error(txt || `Server error (${res.status})`);
             }
 
-            const response = await fetch('/api/shorten', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText || 'Unknown error'}`);
-            }
-
-            const shortUrl = await response.text();
+            const shortUrl = await res.text();
             this.currentShortCode = shortUrl.split('/').pop();
-
-            console.log('URL shortened successfully:', {
-                original: url,
-                shortened: shortUrl,
-                shortCode: this.currentShortCode
-            });
-
             this.shortenedUrl.value = shortUrl;
-            this.resultSection.classList.add('show');
-            this.analyticsSection.classList.add('show');
 
-            // Load initial analytics after a short delay
-            setTimeout(() => this.loadQuickAnalytics(this.currentShortCode), 1000);
+            if (this.analyticsLink) {
+                this.analyticsLink.href = `analytics.html?code=${this.currentShortCode}`;
+            }
+            if (this.viewAnalyticsBtn) {
+                this.viewAnalyticsBtn.href = `analytics.html?code=${this.currentShortCode}`;
+            }
 
-            // Reset copy button
-            this.copyBtn.textContent = 'Copy';
-            this.copyBtn.classList.remove('copied');
+            this.resultSection.style.display = 'block';
+
+
 
         } catch (err) {
-            console.error('Error shortening URL:', err);
-
-            if (err.message.includes('409')) {
-                this.showError('Custom alias is already taken. Please choose a different one.');
-            } else if (err.message.includes('400')) {
-                this.showError('Invalid request. Please check your input and try again.');
-            } else {
-                this.showError('Failed to shorten URL. Please try again.');
-            }
+            this.showError(err.message || 'Something went wrong. Please try again.');
         } finally {
-            this.showLoading(false);
+            this.setLoading(false);
         }
     }
 
     async handleCopy() {
+        const val = this.shortenedUrl.value;
+        if (!val) return;
         try {
-            await navigator.clipboard.writeText(this.shortenedUrl.value);
-            this.copyBtn.textContent = 'Copied!';
-            this.copyBtn.classList.add('copied');
-
-            console.log('URL copied to clipboard:', this.shortenedUrl.value);
-
-            setTimeout(() => {
-                this.copyBtn.textContent = 'Copy';
-                this.copyBtn.classList.remove('copied');
-            }, 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-
-            // Fallback for older browsers
-            try {
-                this.shortenedUrl.select();
-                this.shortenedUrl.setSelectionRange(0, 99999);
-                document.execCommand('copy');
-
-                this.copyBtn.textContent = 'Copied!';
-                this.copyBtn.classList.add('copied');
-
-                setTimeout(() => {
-                    this.copyBtn.textContent = 'Copy';
-                    this.copyBtn.classList.remove('copied');
-                }, 2000);
-            } catch (fallbackErr) {
-                this.showError('Failed to copy URL. Please copy manually.');
-            }
-        }
-    }
-
-    openAnalytics() {
-        if (this.currentShortCode) {
-            const analyticsUrl = `analytics.html?code=${this.currentShortCode}`;
-            window.open(analyticsUrl, '_blank');
-            console.log('Opening analytics for:', this.currentShortCode);
-        }
-    }
-
-    refreshAnalytics() {
-        if (this.currentShortCode) {
-            console.log('Refreshing analytics for:', this.currentShortCode);
-            this.loadQuickAnalytics(this.currentShortCode);
-        }
-    }
-
-    isValidUrl(string) {
-        try {
-            const url = new URL(string);
-            return url.protocol === 'http:' || url.protocol === 'https:';
+            await navigator.clipboard.writeText(val);
         } catch (_) {
-            return false;
+            this.shortenedUrl.select();
+            document.execCommand('copy');
         }
+        this.copyBtn.textContent = 'Copied!';
+        this.copyBtn.classList.add('copied');
+        setTimeout(() => {
+            this.copyBtn.textContent = 'Copy';
+            this.copyBtn.classList.remove('copied');
+        }, 2000);
     }
 
-    isValidAlias(alias) {
-        const regex = /^[a-zA-Z0-9-_]{3,20}$/;
-        return regex.test(alias);
+
+    isValidUrl(s) {
+        try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; }
+        catch (_) { return false; }
     }
+
+    isValidAlias(a) { return /^[a-zA-Z0-9-_]{3,20}$/.test(a); }
 }
 
-// Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Initializing URL Shortener application...');
-    new URLShortener();
-});
+document.addEventListener('DOMContentLoaded', () => new URLShortener());
