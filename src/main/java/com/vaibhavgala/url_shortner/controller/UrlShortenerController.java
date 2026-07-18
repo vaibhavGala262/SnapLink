@@ -1,7 +1,6 @@
 package com.vaibhavgala.url_shortner.controller;
 
 import com.vaibhavgala.url_shortner.service.ClientIPService;
-import com.vaibhavgala.url_shortner.service.KafkaClickProducer;
 import com.vaibhavgala.url_shortner.service.UrlShortnerService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,8 @@ import org.springframework.core.env.Environment;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import com.vaibhavgala.url_shortner.service.events.EventProducer;
 
 @RestController
 public class UrlShortenerController {
@@ -26,7 +27,7 @@ public class UrlShortenerController {
     private ClientIPService clientIPService;
 
     @Autowired
-    private KafkaClickProducer kafkaClickProducer;
+    private EventProducer eventProducer;
 
     public UrlShortenerController(UrlShortnerService service) {
         this.service = service;
@@ -57,8 +58,8 @@ public class UrlShortenerController {
         // String IP_ADDRESS = clientIPService.getClientIP(request);
 
         if (originalUrl.isPresent()) {
-            // KAFKA: Send click event (non-blocking, 1-2ms)
-            kafkaClickProducer.sendClickEvent(
+            // Send click event (non-blocking for Kafka, blocking for Sync)
+            eventProducer.sendClickEvent(
                     shortCode,
                     request.getRemoteAddr(),
                     request.getHeader("User-Agent"),

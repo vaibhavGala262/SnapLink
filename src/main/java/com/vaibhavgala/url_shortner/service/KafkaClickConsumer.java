@@ -18,7 +18,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 @Service
+@ConditionalOnProperty(name = "app.features.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class KafkaClickConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaClickConsumer.class);

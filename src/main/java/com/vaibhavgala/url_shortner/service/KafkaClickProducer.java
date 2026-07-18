@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.vaibhavgala.url_shortner.service.events.EventProducer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.time.LocalDateTime;
 
 @Service
-public class KafkaClickProducer {
+@ConditionalOnProperty(name = "app.features.kafka.enabled", havingValue = "true", matchIfMissing = true)
+public class KafkaClickProducer implements EventProducer {
 
     private static final String TOPIC = "click-events";
 

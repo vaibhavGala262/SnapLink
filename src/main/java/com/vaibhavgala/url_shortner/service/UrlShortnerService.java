@@ -21,7 +21,7 @@ public class UrlShortnerService {
     private UrlMappingRepository repository;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private com.vaibhavgala.url_shortner.service.cache.CacheService cacheService;
 
     // SECURE RANDOM CODE GENERATION CONSTANTS
     private static final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -110,16 +110,11 @@ public class UrlShortnerService {
         repository.save(mapping);
 
         // Cache the new mapping
-        try {
-            Duration cacheTTL = expiresAt != null ?
-                    Duration.between(LocalDateTime.now(), expiresAt) :
-                    Duration.ofHours(24);
+        Duration cacheTTL = expiresAt != null ?
+                Duration.between(LocalDateTime.now(), expiresAt) :
+                Duration.ofHours(24);
 
-            redisTemplate.opsForValue().set(CACHE_PREFIX + shortCode, originalUrl, cacheTTL);
-            System.out.println("💾 Cached new URL: " + shortCode + " → " + originalUrl);
-        } catch (Exception e) {
-            System.out.println("⚠️ Cache failed, continuing without cache: " + e.getMessage());
-        }
+        cacheService.set(CACHE_PREFIX + shortCode, originalUrl, cacheTTL);
 
         System.out.println("🎉 Created: " + shortCode + " → " + originalUrl);
         return shortCode;
@@ -129,16 +124,11 @@ public class UrlShortnerService {
      * Re-caches existing mapping and returns shortCode
      */
     private String reuseExistingMapping(UrlMapping existing, String originalUrl) {
-        try {
-            Duration remainingTTL = existing.getExpiresAt() != null ?
-                    Duration.between(LocalDateTime.now(), existing.getExpiresAt()) :
-                    Duration.ofHours(24);
+        Duration remainingTTL = existing.getExpiresAt() != null ?
+                Duration.between(LocalDateTime.now(), existing.getExpiresAt()) :
+                Duration.ofHours(24);
 
-            redisTemplate.opsForValue().set(CACHE_PREFIX + existing.getShortCode(), originalUrl, remainingTTL);
-            System.out.println("💾 Re-cached existing URL: " + existing.getShortCode());
-        } catch (Exception e) {
-            System.out.println("⚠️ Re-caching failed: " + e.getMessage());
-        }
+        cacheService.set(CACHE_PREFIX + existing.getShortCode(), originalUrl, remainingTTL);
 
         return existing.getShortCode();
     }
@@ -204,16 +194,12 @@ public class UrlShortnerService {
      * Retrieves original URL with caching and expiration checks
      */
     public Optional<String> getOriginalUrl(String shortCode) {
-        // Check Redis cache first (fastest lookup)
+        // Check Cache first (fastest lookup)
         String cacheKey = CACHE_PREFIX + shortCode;
-        try {
-            String cachedUrl = redisTemplate.opsForValue().get(cacheKey);
-            if (cachedUrl != null) {
-                System.out.println("🚀 Cache HIT for: " + shortCode);
-                return Optional.of(cachedUrl);
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Cache lookup failed, falling back to DB: " + e.getMessage());
+        String cachedUrl = cacheService.get(cacheKey);
+        if (cachedUrl != null) {
+            System.out.println("🚀 Cache HIT for: " + shortCode);
+            return Optional.of(cachedUrl);
         }
 
         // Query database if cache miss
@@ -229,16 +215,11 @@ public class UrlShortnerService {
             }
 
             // Cache for future requests if not expired
-            try {
-                Duration remainingTTL = mapping.getExpiresAt() != null ?
-                        Duration.between(LocalDateTime.now(), mapping.getExpiresAt()) :
-                        CACHE_TTL;
+            Duration remainingTTL = mapping.getExpiresAt() != null ?
+                    Duration.between(LocalDateTime.now(), mapping.getExpiresAt()) :
+                    CACHE_TTL;
 
-                redisTemplate.opsForValue().set(cacheKey, mapping.getOriginalUrl(), remainingTTL);
-                System.out.println("💾 DB→Cache: " + shortCode + " → " + mapping.getOriginalUrl());
-            } catch (Exception e) {
-                System.out.println("⚠️ Caching failed: " + e.getMessage());
-            }
+            cacheService.set(cacheKey, mapping.getOriginalUrl(), remainingTTL);
 
             return Optional.of(mapping.getOriginalUrl());
         }
