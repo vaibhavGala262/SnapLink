@@ -6,7 +6,9 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: lite
-      DATABASE_URL: jdbc:postgresql://postgres:5432/snaplink
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: snaplink
       DATABASE_USERNAME: snaplink
       DATABASE_PASSWORD: snaplink
     depends_on:
