@@ -35,7 +35,7 @@ jobs:
       - name: SonarCloud analysis
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn -B sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        run: mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=vaibhavgala262 -Dsonar.projectKey=vaibhavGala262_SnapLink -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       # --- Stage 4a: Upload jar artifact ---
       - name: Upload jar artifact
