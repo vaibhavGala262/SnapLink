@@ -1,0 +1,61 @@
+name: CI / CD
+
+on:
+  push:
+    branches: [feature/add_premium_ui]
+  pull_request:
+    branches: [feature/add_premium_ui]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # --- Stage 1: Init ---
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 23
+        uses: actions/setup-java@v4
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+          cache: maven
+
+      # --- Stage 2: Build / Test / Package ---
+      - name: Build, test, package
+        run: mvn -B -Pci package
+
+      # --- Stage 3: SonarCloud ---
+      - name: SonarCloud analysis
+        uses: sonarsource/sonarcloud-github-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # --- Stage 4a: Upload jar artifact ---
+      - name: Upload jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snaplink-jar
+          path: target/*.jar
+          retention-days: 14
+
+      # --- Stage 4b: GitHub Release (main push only) ---
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/feature/add_premium_ui' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release ${{ github.run_number }}
+          draft: true
+          files: target/*.jar
+
+      # --- Stage 5: Deploy to Render (guarded) ---
+      - name: Deploy to Render
+        if: github.ref == 'refs/heads/feature/add_premium_ui' && github.event_name == 'push' && env.RENDER_DEPLOY_HOOK != ''
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl -X POST "$RENDER_DEPLOY_HOOK"
