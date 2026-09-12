@@ -31,13 +31,11 @@ jobs:
       - name: Build, test, package
         run: mvn -B -Pci package
 
-      # --- Stage 3: SonarCloud ---
+      # --- Stage 3: SonarCloud (Maven plugin — Sonar's recommended path for Maven projects) ---
       - name: SonarCloud analysis
-        uses: SonarSource/sonarqube-scan-action@v7
         env:
-          SONAR_HOST_URL: https://sonarcloud.io
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       # --- Stage 4a: Upload jar artifact ---
       - name: Upload jar artifact
