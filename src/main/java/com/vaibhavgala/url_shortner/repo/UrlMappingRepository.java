@@ -13,7 +13,6 @@ import java.util.Optional;
 public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
     Optional<UrlMapping> findByShortCode(String shortCode);
 
-
     boolean existsByShortCode(String shortCode);
 
     Optional<UrlMapping> findByOriginalUrl(String originalUrl);
@@ -22,9 +21,4 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
     @Transactional
     @Query("UPDATE UrlMapping u SET u.clickCount = u.clickCount + :count WHERE u.shortCode = :shortCode")
     void incrementClickCountBy(String shortCode, int count);
-
-
-    long countByCustom(boolean isCustom);
-
-
 }

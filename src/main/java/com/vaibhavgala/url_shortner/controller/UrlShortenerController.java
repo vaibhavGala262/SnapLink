@@ -55,13 +55,13 @@ public class UrlShortenerController {
     @GetMapping("/{shortCode}")
     public ResponseEntity<Object> redirect(@PathVariable String shortCode, HttpServletRequest request) {
         Optional<String> originalUrl = service.getOriginalUrl(shortCode);
-        // String IP_ADDRESS = clientIPService.getClientIP(request);
+        String ipAddress = clientIPService.getClientIP(request);
 
         if (originalUrl.isPresent()) {
             // Send click event (non-blocking for Kafka, blocking for Sync)
             eventProducer.sendClickEvent(
                     shortCode,
-                    request.getRemoteAddr(),
+                    ipAddress,
                     request.getHeader("User-Agent"),
                     request.getHeader("Referer"));
 

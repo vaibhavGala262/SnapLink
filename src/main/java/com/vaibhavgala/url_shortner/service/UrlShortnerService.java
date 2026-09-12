@@ -1,6 +1,5 @@
 package com.vaibhavgala.url_shortner.service;
 
-import com.vaibhavgala.url_shortner.config.GeoIPConfig;
 import com.vaibhavgala.url_shortner.models.UrlMapping;
 import com.vaibhavgala.url_shortner.repo.UrlMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +97,6 @@ public class UrlShortnerService {
      * Creates new mapping and saves to DB and cache
      */
 
-    @Transactional
     private String createNewMapping(String originalUrl, String shortCode, LocalDateTime expiresAt) {
         UrlMapping mapping = new UrlMapping();
         mapping.setOriginalUrl(originalUrl);
@@ -137,12 +135,13 @@ public class UrlShortnerService {
      * Creates shortened URL with optional custom alias and expiration
      * Flow: Check cache → Check DB → Create new (if needed)
    */
+    @Transactional
     public String shortenUrl(String originalUrl, String customAlias, LocalDateTime expiresAt) {
         boolean hasCustomAlias = (customAlias != null && !customAlias.trim().isEmpty());
 
         if (hasCustomAlias) {
 
-            String alias = customAlias.trim();
+            String alias = customAlias.trim().toLowerCase();
 
             // Validate alias format
             if (!isValidAlias(alias)) {
@@ -228,22 +227,4 @@ public class UrlShortnerService {
         return Optional.empty();
     }
 
-    /**
-     * Utility method to check if a short code exists
-     */
-    public boolean shortCodeExists(String shortCode) {
-        return repository.existsByShortCode(shortCode);
     }
-
-    /**
-     * Get statistics about code generation
-     */
-    public String getCodeGenerationStats() {
-        long totalCodes = repository.count();
-        double keyspaceUtilization = (totalCodes / 3521614606208.0) * 100;
-
-        return String.format(
-                "Total codes: %d, Keyspace utilization: %.8f%%",
-                totalCodes, keyspaceUtilization);
-    }
-}
