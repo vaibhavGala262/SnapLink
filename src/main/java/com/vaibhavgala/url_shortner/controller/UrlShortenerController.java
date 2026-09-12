@@ -1,6 +1,6 @@
 package com.vaibhavgala.url_shortner.controller;
 
-import com.vaibhavgala.url_shortner.service.ClientIPService;
+import com.vaibhavgala.url_shortner.service.enrichment.ClientIPService;
 import com.vaibhavgala.url_shortner.service.UrlShortnerService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;

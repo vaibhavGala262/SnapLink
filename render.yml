@@ -6,31 +6,14 @@ services:
     plan: free
     envVars:
       - key: DB_HOST
-        fromDatabase:
-          name: url-shortener-db
-          property: host
+        value: db.iziihasbfieoutotpytl.supabase.co
       - key: DB_PORT
-        fromDatabase:
-          name: url-shortener-db
-          property: port
+        value: "5432"
       - key: DB_NAME
-        fromDatabase:
-          name: url-shortener-db
-          property: database
+        value: postgres
       - key: DATABASE_USERNAME
-        fromDatabase:
-          name: url-shortener-db
-          property: user
-      - key: DATABASE_PASSWORD
-        fromDatabase:
-          name: url-shortener-db
-          property: password
+        value: postgres
+      # DATABASE_PASSWORD: set this key as a secret in the Render dashboard (never commit it)
       - key: SPRING_PROFILES_ACTIVE
         value: lite
     healthCheckPath: /
-
-databases:
-  - name: url-shortener-db
-    databaseName: url_shortener
-    user: url_shortener_user
-    plan: free

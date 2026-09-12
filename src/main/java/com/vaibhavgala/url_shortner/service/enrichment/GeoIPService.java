@@ -1,4 +1,4 @@
-package com.vaibhavgala.url_shortner.service;
+package com.vaibhavgala.url_shortner.service.enrichment;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;

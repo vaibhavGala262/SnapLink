@@ -1,4 +1,4 @@
-package com.vaibhavgala.url_shortner.service;
+package com.vaibhavgala.url_shortner.service.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaibhavgala.url_shortner.service.events.ClickEvent;

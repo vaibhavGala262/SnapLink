@@ -1,6 +1,7 @@
 package com.vaibhavgala.url_shortner.service;
 
 import com.vaibhavgala.url_shortner.models.UrlClickAnalytics;
+import com.vaibhavgala.url_shortner.service.enrichment.GeoIPService;
 import com.vaibhavgala.url_shortner.service.events.ClickEvent;
 import org.springframework.stereotype.Service;
 import ua_parser.Client;

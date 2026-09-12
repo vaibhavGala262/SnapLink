@@ -1,9 +1,10 @@
-package com.vaibhavgala.url_shortner.service;
+package com.vaibhavgala.url_shortner.service.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaibhavgala.url_shortner.models.UrlClickAnalytics;
 import com.vaibhavgala.url_shortner.repo.UrlClickAnalyticsRepository;
 import com.vaibhavgala.url_shortner.repo.UrlMappingRepository;
+import com.vaibhavgala.url_shortner.service.AnalyticsService;
 import com.vaibhavgala.url_shortner.service.events.ClickEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
