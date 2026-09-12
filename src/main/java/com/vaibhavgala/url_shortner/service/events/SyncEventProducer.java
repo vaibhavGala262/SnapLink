@@ -4,6 +4,8 @@ import com.vaibhavgala.url_shortner.models.UrlClickAnalytics;
 import com.vaibhavgala.url_shortner.repo.UrlClickAnalyticsRepository;
 import com.vaibhavgala.url_shortner.repo.UrlMappingRepository;
 import com.vaibhavgala.url_shortner.service.AnalyticsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 @Service
 @ConditionalOnProperty(name = "app.features.kafka.enabled", havingValue = "false")
 public class SyncEventProducer implements EventProducer {
+
+    private static final Logger log = LoggerFactory.getLogger(SyncEventProducer.class);
 
     @Autowired
     private AnalyticsService analyticsService;
@@ -28,26 +32,15 @@ public class SyncEventProducer implements EventProducer {
     @Transactional
     public void sendClickEvent(String shortCode, String ipAddress, String userAgent, String referer) {
         try {
-            // Create JSON event (reusing the same logic as Kafka for consistency)
-            String clickEvent = String.format(
-                    "{\"shortCode\":\"%s\",\"ipAddress\":\"%s\",\"userAgent\":\"%s\",\"referer\":\"%s\",\"timestamp\":\"%s\"}",
-                    shortCode, ipAddress, userAgent, referer, LocalDateTime.now()
-            );
-
-            // Parse back to entity
-            UrlClickAnalytics analytics = analyticsService.buildAnalyticsEntity(clickEvent);
-
+            ClickEvent event = new ClickEvent(shortCode, ipAddress, userAgent, referer, LocalDateTime.now());
+            UrlClickAnalytics analytics = analyticsService.buildAnalyticsEntity(event);
             if (analytics != null && analytics.getShortCode() != null) {
-                // Save analytics record
                 analyticsRepository.save(analytics);
-                
-                // Increment click count
                 urlRepository.incrementClickCountBy(shortCode, 1);
-                
-                System.out.println("💾 SYNC SAVED: Click event for " + shortCode);
+                log.info("Saved click event for {}", shortCode);
             }
         } catch (Exception e) {
-            System.err.println("❌ SYNC ERROR: Failed to save click event: " + e.getMessage());
+            log.error("Failed to save click event for {}: {}", shortCode, e.getMessage(), e);
         }
     }
 }

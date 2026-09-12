@@ -1,4 +1,4 @@
-package com.vaibhavgala.url_shortner.service;
+package com.vaibhavgala.url_shortner.service.enrichment;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;

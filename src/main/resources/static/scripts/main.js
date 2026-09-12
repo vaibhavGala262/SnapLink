@@ -99,10 +99,10 @@ class URLShortener {
             this.shortenedUrl.value = shortUrl;
 
             if (this.analyticsLink) {
-                this.analyticsLink.href = `analytics.html?code=${this.currentShortCode}`;
+                this.analyticsLink.href = `/analytics?code=${this.currentShortCode}`;
             }
             if (this.viewAnalyticsBtn) {
-                this.viewAnalyticsBtn.href = `analytics.html?code=${this.currentShortCode}`;
+                this.viewAnalyticsBtn.href = `/analytics?code=${this.currentShortCode}`;
             }
 
             this.resultSection.style.display = 'block';
