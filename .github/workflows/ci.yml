@@ -2,9 +2,9 @@ name: CI / CD
 
 on:
   push:
-    branches: [feature/add_premium_ui]
+    branches: [main]
   pull_request:
-    branches: [feature/add_premium_ui]
+    branches: [main]
 
 permissions:
   contents: write
@@ -47,7 +47,7 @@ jobs:
 
       # --- Stage 4b: GitHub Release (main push only) ---
       - name: Create GitHub Release
-        if: github.ref == 'refs/heads/feature/add_premium_ui' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
@@ -57,7 +57,7 @@ jobs:
 
       # --- Stage 5: Deploy to Render (guarded) ---
       - name: Deploy to Render
-        if: github.ref == 'refs/heads/feature/add_premium_ui' && github.event_name == 'push' && env.RENDER_DEPLOY_HOOK != ''
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && env.RENDER_DEPLOY_HOOK != ''
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: curl -X POST "$RENDER_DEPLOY_HOOK"
